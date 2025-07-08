@@ -24,6 +24,8 @@ The Qmodem script that simulates a BBS caller. It dials an entry in the Dial Dir
 and downloads a specified filename using a specified protocol, then says goodbye. A capture file is used to record the entire call
 session with specific log lines and timestamps added such as `#### start_qmodem <time>` or `#### start_download <time>`.
 
+**Note:** this script needs to be modified before use and before testing, see below.
+
 Upon any errors, unexpected characters, lost carrier, the script aborts and exits Qmodem. This is because the call will be considered
 as a failure and there's no need to attempt to recover during the call.
 
@@ -55,5 +57,26 @@ Example timestamps marking events in the call:
 
 ```
 
+#### Usage notes
 
-The post-processing Python script is still a work in progress and thus I haven't published it.
+This is all documented in the script itself, but calling it out here. You'll need to create a Dial Directory entry for the BBS
+you're calling, and save the password in that entry. Take note of which directory entry number, e.g. #3, you want to test with.
+
+In the DL.SCR around lines 30-40 will be a set of variables. USERNAME will need to be set to the name of the test caller associated
+with the password. DIALNUM will be the directory entry number. DLPATH will be the base directory to use for test downloads.
+
+On my BBS I have a set of dummy data files I use for testing that are named based on their file size, e.g. TEST64K.DAT is a text
+file 64 KB in size, TEST256K.DAT is 256 KB, and so on. SIZE lets me easily set which test size to change to. PROTO is the download
+protocol to use.
+
+This all affects the name of the output .CAP file as specified in the Capture statement in the script. For example if today I am
+testing 64 KB Ymodem downloads, the resulting capture file will be called C:\DL\0122\64KY3.CAP, indicating this was a capture file
+of 64 KB downloads using Ymodem and calling directory entry #3.
+
+### qparse.py
+
+A python3 script that parses the *.CAP output from dl.scr (covering one or many calls) listing individual call performance and summarizing
+all modem calls made during the test session.
+
+I seem to eventually find edge case bugs in this script, but after the 4th or 5th rewrite I'm pretty okay with its results. I
+recommend keeping your capture files around for reprocessing just in case if this is the sort of thing you care about.
